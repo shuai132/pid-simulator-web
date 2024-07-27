@@ -191,7 +191,7 @@
             flex-direction: row;
             bottom: 0px;
             left: 0px;
-            max-height: 200px;
+            max-height: 1000px;
             width: 100%;
             max-width: 800px;
             background-color: lightgray;
@@ -211,6 +211,7 @@
         #render-canvas {
             width: 100%;
             height: 100%;
+            margin-top: -230px;
         }
 
         /* 顶部区域样式 */
@@ -586,6 +587,12 @@
         <tr>
             <td><p id="status-pid-out" class="status-label">000.00</p></td>
         </tr>
+        <tr>
+            <td><p class="status-label">PID积分</p></td>
+        </tr>
+        <tr>
+            <td><p id="status-pid-integral" class="status-label">000.00</p></td>
+        </tr>
     </table>
     <canvas id="scope-canvas"></canvas>
 </div>
@@ -720,7 +727,7 @@
             cascadePID.calc(targetPos, ball.position.x, ball.velocity.x);
             pidForce.x = cascadePID.output;
         }
-        histSamples.push({target: targetPos, ball: ball.position.x});//将当前状态入队
+        histSamples.push({target: targetPos, ball: ball.position.x, integral: singlePID.integral});//将当前状态入队
         if (histSamples.length > histQueueLength)//保持队列不超过指定长度
             histSamples.shift();
     }, 20);//每20ms计算一次
@@ -829,11 +836,20 @@
             scopectx.lineTo(scope.width * (i + 1) / histQueueLength, scope.height / 2 - (histSamples[i + 1].ball - scrWidth / 2) * scope.height / scrWidth);
             scopectx.closePath();
             scopectx.stroke();
+            //绘制积分值
+            scopectx.strokeStyle = "gray";
+            scopectx.beginPath();
+            // 为了图中看清 放大100倍
+            scopectx.moveTo(scope.width * i / histQueueLength, scope.height / 2 - (histSamples[i].integral * 100 - scrWidth / 2) * scope.height / scrWidth);
+            scopectx.lineTo(scope.width * (i + 1) / histQueueLength, scope.height / 2 - (histSamples[i + 1].integral * 100 - scrWidth / 2) * scope.height / scrWidth);
+            scopectx.closePath();
+            scopectx.stroke();
         }
         //更新状态值
         document.getElementById("status-target-pos").innerText = targetPos.toFixed(2);
         document.getElementById("status-ball-pos").innerText = ball.position.x.toFixed(2);
         document.getElementById("status-pid-out").innerText = pidForce.x.toFixed(2);
+        document.getElementById("status-pid-integral").innerText = singlePID.integral.toFixed(2);
     }, 30);//30ms更新一次
 </script>
 </body>
