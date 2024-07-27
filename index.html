@@ -603,7 +603,7 @@
     var scrWidth = window.innerWidth;//渲染画布宽度为屏幕高度
     var scrHeight = window.innerHeight - document.getElementById("settings-div").clientHeight;//渲染画布高度为屏幕高度减去头部配置区域高度
     var targetPos = scrWidth / 2;//目标位置
-    var singlePID = new PID(0.1, 0.01, 1, 10, 10);//单级PID对象
+    var singlePID = new PID(0.07, 0.01, 1, 10, 10);//单级PID对象
     var cascadePID = new CascadePID([0, 0, 0, 0, 0], [0, 0, 0, 0, 0]);//串级PID对象
     var pidForce = {x: 0, y: 0};//PID计算产生的力
     var staticForce = {x: 5, y: 0};//干扰恒力
