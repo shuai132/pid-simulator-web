@@ -21,10 +21,10 @@ class PID {
         var pErr = this.error * this.kp;
         var dErr = (this.error - this.lastError) * this.kd;
 
-        switch (3) {
+        switch (0) {
             // 正常积分
             case 0: {
-                this.integral += this.ki * this.error;
+                this.integral += this.error;
                 this.integral = this.limit(this.integral, -this.maxInt, this.maxInt);
                 break;
             }
@@ -34,7 +34,7 @@ class PID {
                 if ((Math.abs(this.output) >= this.maxOut) && (this.output * this.error >= 0)) {
                     this.integral = 0;
                 } else {
-                    this.integral += this.ki * this.error;
+                    this.integral += this.error;
                     this.integral = this.limit(this.integral, -this.maxInt, this.maxInt);
                 }
                 break;
@@ -47,7 +47,7 @@ class PID {
                 // 值太小会导致积分失效
                 const e = 100;
                 if (Math.abs(this.error) <= e) {
-                    this.integral += this.ki * this.error;
+                    this.integral += this.error;
                     this.integral = this.limit(this.integral, -this.maxInt, this.maxInt);
                 } else {
                     this.integral = 0;
@@ -58,14 +58,14 @@ class PID {
             // 过调能减弱一些 能更加提前清空积分
             case 3: {
                 let kb = this.ki / this.kp;
-                this.integral += this.ki * this.error;
+                this.integral += this.error;
                 this.integral += kb * (this.error - this.lastError);
                 this.integral = this.limit(this.integral, -this.maxInt, this.maxInt);
                 break;
             }
         }
 
-        var sumErr = pErr + dErr + this.integral;
+        var sumErr = pErr + dErr + this.integral * this.ki;
         this.output = this.limit(sumErr, -this.maxOut, this.maxOut);
     }
 
