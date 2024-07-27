@@ -377,9 +377,9 @@
                     <td><p class="param-label">鼠标操作</p></td>
                     <td>
                         <div class="hori-flex-div">
-                            <input id="select-ctrl-ball" name="mouse-ctrl" type="radio" checked><label
+                            <input id="select-ctrl-ball" name="mouse-ctrl" type="radio"><label
                                 for="select-ctrl-ball">推动小球</label>
-                            <input id="select-ctrl-target" name="mouse-ctrl" type="radio"><label
+                            <input id="select-ctrl-target" name="mouse-ctrl" type="radio" checked><label
                                 for="select-ctrl-target">修改目标</label>
                         </div>
                     </td>
@@ -398,9 +398,31 @@
                 <tr>
                     <td><p class="param-label">干扰恒力</p></td>
                     <td><input id="static-force-range" class="input-range" type="range" min="-10" max="10" step="0.5"
-                               value="0" oninput="onRangeInput(event)"></td>
-                    <td><input id="static-force-number" class="input-range-value" type="number" value="0"
+                               value="5" oninput="onRangeInput(event)"></td>
+                    <td><input id="static-force-number" class="input-range-value" type="number" value="5"
                                onchange="staticForce.x=parseFloat(this.value)"></td>
+                </tr>
+                <tr>
+                    <td><p class="param-label">位置调整</p></td>
+                    <td><input id="target-pos-range" class="input-range" type="range" min="0" max="1000" step="1"
+                               value="100" oninput="onRangeInput(event)"></td>
+                    <td><input id="target-pos-number" class="input-range-value" type="number" value="100"
+                               onchange="targetPos=parseFloat(this.value)"></td>
+                </tr>
+                <tr>
+                    <td><p class="param-label">位置调整</p></td>
+                    <td>
+                        <input id="target-pos-1-number" class="input-range-value" type="number" value="100"
+                               onchange="targetPos=parseFloat(this.value)">
+                        <button type="button"
+                                onclick="targetPos=parseFloat(document.getElementById('target-pos-1-number').value)">调整
+                        </button>
+                        <input id="target-pos-2-number" class="input-range-value" type="number" value="800"
+                               onchange="targetPos=parseFloat(this.value)">
+                        <button type="button"
+                                onclick="targetPos=parseFloat(document.getElementById('target-pos-2-number').value)">调整
+                        </button>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -574,13 +596,13 @@
     var scrWidth = window.innerWidth;//渲染画布宽度为屏幕高度
     var scrHeight = window.innerHeight - document.getElementById("settings-div").clientHeight;//渲染画布高度为屏幕高度减去头部配置区域高度
     var targetPos = scrWidth / 2;//目标位置
-    var singlePID = new PID(0, 0, 0, 0, 0);//单级PID对象
+    var singlePID = new PID(0.1, 0.01, 1, 10, 10);//单级PID对象
     var cascadePID = new CascadePID([0, 0, 0, 0, 0], [0, 0, 0, 0, 0]);//串级PID对象
     var pidForce = {x: 0, y: 0};//PID计算产生的力
-    var staticForce = {x: 0, y: 0};//干扰恒力
+    var staticForce = {x: 5, y: 0};//干扰恒力
     var isSinglePID = true;//当前PID类型 true:单级 false:串级
     const histQueueLength = 200;//历史数据留存个数（用于示波器绘图）
-    var histSamples = new Array();//历史数据队列
+    var histSamples = [];//历史数据队列
 
     //matter引擎相关工具
     var Engine = Matter.Engine;
@@ -740,11 +762,11 @@
     }
 
     //进入时询问是否开启教程
-    setTimeout(function () {
-        if (confirm("是否开启引导教程？")) {
-            document.getElementById("select-teach-on").click();
-        }
-    }, 500);
+    // setTimeout(function () {
+    //     if (confirm("是否开启引导教程？")) {
+    //         document.getElementById("select-teach-on").click();
+    //     }
+    // }, 500);
     //状态浮动窗口点击动画响应
     var floatDivExpanded = true;//当前展开状态
     function onStatusFloatClick(event) { //在窗口被点击时调用
