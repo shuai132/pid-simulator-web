@@ -10,6 +10,11 @@ class PID {
         this.integral = 0;
         this.output = 0;
         this.periodMs = 20;
+        this.adjust = 0;
+
+        this.lastTarget = 0;
+        this.waitUp = false;
+        this.waitDown = false;
     }
 
     limit(value, min, max) {
@@ -17,6 +22,19 @@ class PID {
     }
 
     calc(ref, fdb) {
+        const learn_left = 4;
+        const learn_right = 6;
+        if (ref !== this.lastTarget) {
+            if (ref > this.lastTarget) {
+                this.waitUp = true;
+                this.adjust = learn_right;
+            } else {
+                this.waitDown = true;
+                this.adjust = learn_left;
+            }
+            this.lastTarget = ref;
+        }
+
         this.error = ref - fdb;
 
         const pSum = this.kp * this.error;
@@ -25,7 +43,7 @@ class PID {
         const iSum = this.kp * this.integral;
         const dSum = this.kp * this.kd * (this.error - this.lastError) / this.periodMs
         const sum = pSum + iSum + dSum;
-        this.output = this.limit(sum, -this.maxOut, this.maxOut);
+        this.output = this.limit(sum, -this.maxOut, this.maxOut) - this.adjust;
 
         this.lastError = this.error;
     }
