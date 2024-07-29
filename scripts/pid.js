@@ -9,6 +9,7 @@ class PID {
         this.lastError = 0;
         this.integral = 0;
         this.output = 0;
+        this.periodMs = 20;
     }
 
     limit(value, min, max) {
@@ -16,6 +17,20 @@ class PID {
     }
 
     calc(ref, fdb) {
+        this.error = ref - fdb;
+
+        const pSum = this.kp * this.error;
+        this.integral += this.ki * this.error * this.periodMs;
+        this.integral = this.limit(this.integral, -this.maxInt, this.maxInt);
+        const iSum = this.kp * this.integral;
+        const dSum = this.kp * this.kd * (this.error - this.lastError) / this.periodMs
+        const sum = pSum + iSum + dSum;
+        this.output = this.limit(sum, -this.maxOut, this.maxOut);
+
+        this.lastError = this.error;
+    }
+
+    calc_test(ref, fdb) {
         this.lastError = this.error;
         this.error = ref - fdb;
         var pErr = this.error * this.kp;
