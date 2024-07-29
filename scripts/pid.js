@@ -13,8 +13,6 @@ class PID {
         this.adjust = 0;
 
         this.lastTarget = 0;
-        this.waitUp = false;
-        this.waitDown = false;
     }
 
     limit(value, min, max) {
@@ -26,10 +24,8 @@ class PID {
         const learn_right = 6;
         if (ref !== this.lastTarget) {
             if (ref > this.lastTarget) {
-                this.waitUp = true;
                 this.adjust = learn_right;
             } else {
-                this.waitDown = true;
                 this.adjust = learn_left;
             }
             this.lastTarget = ref;
